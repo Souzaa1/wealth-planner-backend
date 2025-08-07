@@ -1,15 +1,172 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      UserRole @default(VIEWER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Client {
+  id            String        @id @default(cuid())
+  name          String
+  email         String        @unique
+  age           Int
+  isActive      Boolean       @default(true)
+  familyProfile FamilyProfile
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relacionamentos
+  goals       Goal[]
+  wallets     Wallet[]
+  events      Event[]
+  simulations Simulation[]
+  insurances  Insurance[]
+
+  @@map("clients")
+}
+
+model Goal {
+  id          String   @id @default(cuid())
+  clientId    String
+  type        GoalType
+  description String
+  targetValue Decimal  @db.Decimal(15, 2)
+  targetDate  DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("goals")
+}
+
+model Wallet {
+  id               String   @id @default(cuid())
+  clientId         String
+  assetClass       String
+  percentage       Decimal  @db.Decimal(5, 2)
+  currentValue     Decimal  @db.Decimal(15, 2)
+  totalPatrimony   Decimal  @db.Decimal(15, 2)
+  alignmentPercent Decimal  @db.Decimal(5, 2)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relacionamentos
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("wallets")
+}
+
+model Event {
+  id          String         @id @default(cuid())
+  clientId    String
+  type        EventType
+  description String?
+  value       Decimal        @db.Decimal(15, 2)
+  frequency   EventFrequency
+  startDate   DateTime
+  endDate     DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  // Relacionamentos
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("events")
+}
+
+model Simulation {
+  id              String   @id @default(cuid())
+  clientId        String
+  name            String
+  initialValue    Decimal  @db.Decimal(15, 2)
+  interestRate    Decimal  @db.Decimal(5, 4) // Taxa de juros anual
+  projectionYears Int
+  projectionData  Json // Array de {year, projectedValue}
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relacionamentos
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("simulations")
+}
+
+model Insurance {
+  id          String        @id @default(cuid())
+  clientId    String
+  type        InsuranceType
+  coverage    Decimal       @db.Decimal(15, 2)
+  premium     Decimal       @db.Decimal(10, 2)
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relacionamentos
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("insurances")
+}
+
+// Enums
+enum UserRole {
+  ADVISOR
+  VIEWER
+}
+
+enum FamilyProfile {
+  CONSERVATIVE
+  MODERATE
+  AGGRESSIVE
+  ULTRA_HIGH_NET_WORTH
+}
+
+enum GoalType {
+  RETIREMENT
+  SHORT_TERM
+  MEDIUM_TERM
+  LONG_TERM
+  EDUCATION
+  REAL_ESTATE
+  EMERGENCY_FUND
+}
+
+enum EventType {
+  INCOME
+  EXPENSE
+  INVESTMENT
+  WITHDRAWAL
+  BONUS
+  INHERITANCE
+  LOAN
+}
+
+enum EventFrequency {
+  ONCE
+  MONTHLY
+  QUARTERLY
+  ANNUALLY
+}
+
+enum InsuranceType {
+  LIFE
+  DISABILITY
+  HEALTH
+  PROPERTY
+  LIABILITY
 }

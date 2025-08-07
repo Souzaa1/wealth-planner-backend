@@ -1,5 +1,5 @@
-# Use Node.js 22 Alpine image
-FROM node:22.18.1-alpine
+# Use Node.js 20 Alpine image
+FROM node:20-alpine
 
 # Set working directory
 WORKDIR /app
@@ -7,11 +7,14 @@ WORKDIR /app
 # Install dependencies for building native modules
 RUN apk add --no-cache python3 make g++
 
-# Copy package files
-COPY package*.json ./
+# Install pnpm
+RUN npm install -g pnpm
 
-# Install dependencies
-RUN npm ci --only=production
+# Copy package files
+COPY package*.json pnpm-lock.yaml ./
+
+# Install dependencies using pnpm
+RUN pnpm install --frozen-lockfile
 
 # Copy source code
 COPY . .
@@ -20,7 +23,7 @@ COPY . .
 RUN npx prisma generate
 
 # Build the application
-RUN npm run build
+RUN pnpm run build
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs
@@ -35,8 +38,7 @@ EXPOSE 4000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:4000/api/v1/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+  CMD node -e "require(\'http\' ).get(\'http://localhost:4000/api/v1/health\', (res ) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 # Start the application
-CMD ["npm", "start"]
-
+CMD ["pnpm", "start"]

@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: planner
+      POSTGRES_PASSWORD: plannerpw
+      POSTGRES_DB: plannerdb
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: .
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://planner:plannerpw@db:5432/plannerdb
+      NODE_ENV: production
+    ports:
+      - "4000:4000"
+
+volumes:
+  pg_data:
