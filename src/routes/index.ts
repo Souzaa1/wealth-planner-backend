@@ -4,10 +4,20 @@ import { goalRoutes } from './goalRoutes';
 import { walletRoutes } from './walletRoutes';
 import { eventRoutes } from './eventRoutes';
 import { simulationRoutes } from './simulationRoutes';
+import { authRoutes } from './authRoutes';
 
 export async function registerRoutes(fastify: FastifyInstance) {
-
   await fastify.register(async function (fastify) {
+    fastify.addSchema({
+      $id: 'ErrorResponse',
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', default: false },
+        error: { type: 'string' },
+        data: { type: 'array', items: { type: 'object' }, nullable: true }
+      }
+    });
+
     fastify.get('/health', {
       schema: {
         tags: ['Health'],
@@ -34,6 +44,8 @@ export async function registerRoutes(fastify: FastifyInstance) {
       };
     });
 
+    await fastify.register(authRoutes);
+
     await fastify.register(clientRoutes);
     await fastify.register(goalRoutes);
     await fastify.register(walletRoutes);
@@ -51,4 +63,3 @@ export async function registerRoutes(fastify: FastifyInstance) {
     };
   });
 }
-

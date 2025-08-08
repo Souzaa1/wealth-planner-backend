@@ -122,6 +122,18 @@ export interface ApiResponse<T = any> {
     error?: string;
 }
 
+export interface AuthResponse {
+    user: {
+        id: string;
+        email: string;
+        role: string;
+        createdAt: Date;
+        updatedAt: Date;
+    };
+    token: string;
+    expiresIn: string;
+}
+
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {
     pagination: {
         page: number;
