@@ -2,11 +2,12 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { prisma } from '../models';
-import { ApiResponse, LoginRequest, RegisterRequest } from '../types';
+import { ApiResponse } from '../types';
 
 const registerSchema = z.object({
     email: z.string().email('Email inválido'),
     password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
+    name: z.string().min(1, 'Nome é obrigatório'),
     role: z.enum(['ADVISOR', 'VIEWER']).optional().default('VIEWER')
 });
 
@@ -20,7 +21,6 @@ export class AuthController {
         try {
             const data = registerSchema.parse(request.body);
 
-            // Verificar se o email já está em uso
             const existingUser = await prisma.user.findUnique({
                 where: { email: data.email }
             });
@@ -33,14 +33,14 @@ export class AuthController {
             }
 
             const hashedPassword = await bcrypt.hash(data.password, 10);
-
             const user = await prisma.user.create({
                 data: {
                     email: data.email,
                     password: hashedPassword,
+                    name: data.name,
                     role: data.role
                 },
-                select: { id: true, email: true, role: true } 
+                select: { id: true, email: true, role: true, name: true }
             });
 
             return reply.status(201).send({
@@ -90,7 +90,12 @@ export class AuthController {
             }
 
             const token = (request.server as any).jwt.sign(
-                { userId: user.id, email: user.email, role: user.role }
+                {
+                    userId: user.id,
+                    email: user.email,
+                    role: user.role,
+                    name: user.name
+                }
             );
 
             return reply.send({

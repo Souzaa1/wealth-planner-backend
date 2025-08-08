@@ -11,6 +11,7 @@ datasource db {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
+  name      String
   password  String
   role      UserRole @default(VIEWER)
   createdAt DateTime @default(now())
@@ -29,7 +30,6 @@ model Client {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  // Relacionamentos
   goals       Goal[]
   wallets     Wallet[]
   events      Event[]
@@ -49,7 +49,6 @@ model Goal {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Relacionamentos
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("goals")
@@ -66,7 +65,6 @@ model Wallet {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  // Relacionamentos
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("wallets")
@@ -84,7 +82,6 @@ model Event {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 
-  // Relacionamentos
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("events")
@@ -95,13 +92,12 @@ model Simulation {
   clientId        String
   name            String
   initialValue    Decimal  @db.Decimal(15, 2)
-  interestRate    Decimal  @db.Decimal(5, 4) // Taxa de juros anual
+  interestRate    Decimal  @db.Decimal(5, 4) 
   projectionYears Int
-  projectionData  Json // Array de {year, projectedValue}
+  projectionData  Json 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  // Relacionamentos
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("simulations")
@@ -117,7 +113,6 @@ model Insurance {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
-  // Relacionamentos
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("insurances")

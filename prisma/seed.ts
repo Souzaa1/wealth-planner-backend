@@ -14,7 +14,8 @@ async function main() {
     create: {
       email: 'advisor@wealthplanner.com',
       password: hashedPassword,
-      role: 'ADVISOR'
+      role: 'ADVISOR',
+      name: 'João Advisor',
     }
   });
 
@@ -24,7 +25,8 @@ async function main() {
     create: {
       email: 'viewer@wealthplanner.com',
       password: hashedPassword,
-      role: 'VIEWER'
+      role: 'VIEWER',
+      name: 'Maria Viewer'
     }
   });
 

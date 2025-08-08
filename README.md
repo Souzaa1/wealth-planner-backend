@@ -133,6 +133,11 @@ A documentação interativa da API está disponível em:
 
 ### Principais Endpoints
 
+#### Autenticação
+- `POST /api/v1/auth/login` - Login de usuário
+- `POST /api/v1/auth/register` - Registro de novo usuário
+- `GET /api/v1/auth/profile` - Obter perfil do usuário
+
 #### Clientes
 - `GET /api/v1/clients` - Listar clientes
 - `POST /api/v1/clients` - Criar cliente
@@ -271,7 +276,6 @@ docker-compose down
 ### Autenticação JWT
 
 ```bash
-# Login (endpoint a ser implementado)
 POST /api/v1/auth/login
 {
   "email": "advisor@wealthplanner.com",

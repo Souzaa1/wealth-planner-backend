@@ -46,7 +46,7 @@ describe('WealthProjectionService', () => {
       const result = WealthProjectionService.simulateWealthCurve(params);
       
       const finalValue = result[result.length - 1].projectedValue;
-      expect(finalValue).toBeGreaterThan(100000 + 12 * 5000); // Pelo menos o valor sem juros
+      expect(finalValue).toBeGreaterThan(100000 + 12 * 5000); 
     });
 
     it('should apply one-time events only once', () => {

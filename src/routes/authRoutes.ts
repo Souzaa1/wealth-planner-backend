@@ -93,6 +93,7 @@ export async function authRoutes(fastify: FastifyInstance) {
                             properties: {
                                 userId: { type: 'string' },
                                 email: { type: 'string' },
+                                name: { type: 'string' },
                                 role: { type: 'string' }
                             }
                         },
